@@ -7,8 +7,9 @@ Vending machine with CLI
   
 Current TODO:
 ----------
-Finish purchase
-  -input coins
-  -calculate change denominations
-  -vend item / return change
-  -handle cancellation
+- [ ] purchase
+  - [x] find stock item
+  - [ ] input coins
+  - [ ] calculate change denominations
+  - [ ] vend item / return change
+  - [ ] handle cancellation
