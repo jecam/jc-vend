@@ -6,7 +6,7 @@ Vending machine with CLI
   
   
 Current TODO:
-==========
+----------
 Finish purchase
   -input coins
   -calculate change denominations
