@@ -46,10 +46,12 @@ BOOLEAN load_data(struct vm * vm, const char * item_fname,
 {
      
     if (!load_items(vm, item_fname)) {
+        printf("Problem with item file\n");
         return FALSE;
     }
 
     if (!load_coins(vm, coins_fname)) {
+        printf("Problem with coin file\n");
         return FALSE;
     }
     
@@ -79,6 +81,4 @@ void *safe_malloc(size_t size)
 	}
 	return mem;
 }
-
-
 

@@ -9,7 +9,7 @@ Current TODO:
 ----------
 - [ ] purchase
   - [x] find stock item
-  - [ ] input coins
-  - [ ] calculate change denominations
+  - [x] input coins (also added coin validation)
+  - [x] calculate change denominations
   - [ ] vend item / return change
   - [ ] handle cancellation

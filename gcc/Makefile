@@ -98,7 +98,7 @@ test: all
 	$(BIN_PATH)/./$(BIN) $(BIN_PATH)/data/stock.dat $(BIN_PATH)/data/coins.dat
 
 .PHONY: memtest
-memtest: all
+memtest: debug
 	$(MEMAPP) $(BIN_PATH)/./$(BIN) $(BIN_PATH)/data/stock.dat $(BIN_PATH)/data/coins.dat
 
 .PHONY: archive

@@ -10,7 +10,12 @@
 
 
 BOOLEAN load_coins(struct vm * vm, const char * coins_fname);
-enum denomination str_to_denom(char * str);
+BOOLEAN validate_coin(int coin);
+BOOLEAN str_to_denom(char * str, enum denomination * denom);
+BOOLEAN int_to_denom(int value, enum denomination* denom);
 char * denom_to_str(enum denomination denom);
+int take_coin(int coin_buffer[NUMDENOMS]);
+int* accept_payment(int required);
+
 
 #endif

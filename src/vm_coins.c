@@ -1,5 +1,6 @@
 #include "vm_coins.h"
 #include "vm_type.h"
+#include "vm_utility.h"
 
 /* Loads coins from a file */
 BOOLEAN load_coins(struct vm * vm, const char * coins_fname) {
@@ -18,7 +19,9 @@ BOOLEAN load_coins(struct vm * vm, const char * coins_fname) {
         unsigned count;
 
         tok = strtok(line, ",");
-        denom = str_to_denom(tok);
+        if(!str_to_denom(tok, &denom)) {
+            return FALSE;
+        }
         tok = strtok(NULL, "\n");
         count = strtol(tok, NULL, 10);
         
@@ -31,34 +34,64 @@ BOOLEAN load_coins(struct vm * vm, const char * coins_fname) {
     return TRUE;
 }
 
-enum denomination str_to_denom(char * str) {
+BOOLEAN validate_coin(int coin) {
+    int valid_coins[NUMDENOMS] = {5, 10, 20, 50, 100, 200, 500, 1000};
+    int i;
+
+    for ( i = 0; i < NUMDENOMS; i++ ) {
+        if ( valid_coins[i] == coin ) {
+            return TRUE;
+        }
+        if ( valid_coins[i] > coin ) {
+            break;
+        }
+    }
+    return FALSE;
+}
+
+BOOLEAN str_to_denom(char * str, enum denomination * denom) {
     int value;
 
     value = strtol(str, NULL, 10);
 
+    if(!validate_coin(value)) {
+        return FALSE;
+    }
+
+    return int_to_denom(value, denom);
+}
+
+BOOLEAN int_to_denom(int value, enum denomination * denom) {
+
     switch(value) {
     case 1000:
-        return TEN_DOLLARS;
+        *denom = TEN_DOLLARS;
+        return TRUE;
     case 500:
-        return FIVE_DOLLARS;
+        *denom = FIVE_DOLLARS;
+        return TRUE;
     case 200:
-        return TWO_DOLLARS;
+        *denom = TWO_DOLLARS;
+        return TRUE;
     case 100:
-        return ONE_DOLLAR;
+        *denom = ONE_DOLLAR;
+        return TRUE;
     case 50:
-        return FIFTY_CENTS;
+        *denom = FIFTY_CENTS;
+        return TRUE;
     case 20:
-        return TWENTY_CENTS;
+        *denom = TWENTY_CENTS;
+        return TRUE;
     case 10:
-        return TEN_CENTS;
+        *denom = TEN_CENTS;
+        return TRUE;
     case 5:
-        return FIVE_CENTS;
+        *denom = FIVE_CENTS;
+        return TRUE;
     default:
         break;
     }
-
-    return 0;
-
+    return FALSE;
 }
 
 char * denom_to_str(enum denomination denom) {
@@ -84,3 +117,44 @@ char * denom_to_str(enum denomination denom) {
         return "null";
     }
 }
+
+
+
+int take_coin(int coin_buffer[NUMDENOMS]) {
+    char input[5];
+    
+    enum denomination denom;
+    
+    printf("Insert coin: ");
+    fgets(input, 5, stdin);
+
+    if(str_to_denom(input, &denom)) {
+        coin_buffer[denom]++;
+        return strtol(input, NULL, 10);
+    }
+    return -1;
+}
+
+
+/* Take input of coins into a "coin buffer" array
+ * Accepts value required, returns pointer to coin buffer
+ */
+
+int* accept_payment(int required) {
+    int* coin_buffer;
+    int payment = 0;
+
+    coin_buffer = safe_malloc(sizeof(*coin_buffer * NUMDENOMS));
+
+    while ( payment < required ) {
+        int coinval = take_coin(coin_buffer);
+        if(coinval == -1) {
+            return NULL;
+        } else {
+            payment += coinval;
+        }
+    }
+
+    return coin_buffer;
+}
+
