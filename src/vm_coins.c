@@ -119,42 +119,57 @@ char * denom_to_str(enum denomination denom) {
 }
 
 
-
-int take_coin(int coin_buffer[NUMDENOMS]) {
-    char input[5];
-    
-    enum denomination denom;
-    
+char* take_coin_input(char * input) {    
     printf("Insert coin: ");
     fgets(input, 5, stdin);
+    
+    return input;
+}
 
+/* Feed a coin into the coin buffer, 
+ * coin buffer and input string are passed in
+ * returns -1 for abort, 0 if input was invalid, or value of the coin
+ * in cents if it worked.
+ */
+int take_coin(int coin_buffer[NUMDENOMS], char* input) {
+    enum denomination denom;
+
+    if(input[0] == '\0' || input[0] == '\n'){
+        return -1;
+    }
+    
     if(str_to_denom(input, &denom)) {
         coin_buffer[denom]++;
         return strtol(input, NULL, 10);
     }
-    return -1;
+    return 0;
 }
 
 
 /* Take input of coins into a "coin buffer" array
- * Accepts value required, returns pointer to coin buffer
+ * Accepts as parameters the coin buffer and the required amount
+ * Returns the amount of change owing in cents, or -1 for abort
  */
 
-int* accept_payment(int required) {
-    int* coin_buffer;
+int accept_payment(int coin_buffer[NUMDENOMS], int required){
     int payment = 0;
-
-    coin_buffer = safe_malloc(sizeof(*coin_buffer * NUMDENOMS));
-
+    
     while ( payment < required ) {
-        int coinval = take_coin(coin_buffer);
-        if(coinval == -1) {
-            return NULL;
+        int coinval;
+        char* coin_input = safe_malloc(sizeof(*coin_input) * 5);
+
+        take_coin_input(coin_input);
+        coinval = take_coin(coin_buffer, coin_input);
+        free(coin_input);
+        if(coinval == 0) {
+            printf("Invalid coin denomination.\n");
+        } else if (coinval == -1) {
+            return -1;        
         } else {
             payment += coinval;
         }
     }
 
-    return coin_buffer;
+    return payment - required;
 }
 

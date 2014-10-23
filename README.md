@@ -3,7 +3,11 @@ jc-vend
 
 Vending machine with CLI
   Implementation of "vending machine" assignment for RMIT Advanced Programming Techniques course, Semester 2, 2014
-  
+
+Latest Changes
+----------
+- accept payment function
+- tidied up test suite  
   
 Current TODO:
 ----------
