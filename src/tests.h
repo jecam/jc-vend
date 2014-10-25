@@ -3,14 +3,18 @@
 #define TEST_PASS "\x1b[32mSuccess\x1b[39m\n"
 #define TEST_FAIL "\x1b[31mFailure\x1b[39m\n"
 
-#define PASS_FAIL(message) printf("%-60s%s", message, TEST_PASS);    \
+/* Macros are gross but I can't think of a better way to do this. Sorry. */
+#define PASS_FAIL(message)                         \
+    printf("%-35s%s", message, TEST_PASS);         \
     stats[1]++;                                    \
-    } else {                                    \
-    printf("%-60s%s", message, TEST_FAIL);        \
+    } else {                                       \
+    printf("%-35s%s", message, TEST_FAIL);         \
     stats[2]++;
 
+/* Item retrieval tests */
+
 void get_missing_item(int stats[3], struct vm* vm) {
-    char* message = "Testing item retrieval (item not present)...";
+    char* message = "  -Item not in list...";
     stats[0]++;
     if(retrieve_item(vm->item_list, "I0099") == NULL) {
         PASS_FAIL(message);
@@ -20,7 +24,7 @@ void get_missing_item(int stats[3], struct vm* vm) {
 void get_present_item(int stats[3], struct vm* vm) {
     struct stock_item* item;
     char* search_string = "I0001";
-    char* message ="Testing item retrieval (item present)...";
+    char* message ="  -Item present in list...";
     stats[0]++;
     item = retrieve_item(vm->item_list, search_string);
     if(item == NULL) {
@@ -32,11 +36,13 @@ void get_present_item(int stats[3], struct vm* vm) {
         PASS_FAIL(message);
     }
 }
-/**/
+/* end item retrieval*/
+
+/* Coin validation tests */
 
 void meta_validate_coin(int stats[3], int coin, const char* coinname, BOOLEAN expected) {
     char message[80];
-    strcpy(message, "Testing validate coin on ");
+    strcpy(message, "  -");
     strcat(message, coinname);
     strcat(message, "...");
     
@@ -48,49 +54,51 @@ void meta_validate_coin(int stats[3], int coin, const char* coinname, BOOLEAN ex
 }
 
 void validate_coin_zero(int stats[3]) {
-    meta_validate_coin(stats, 0, "zero", FALSE);
+    meta_validate_coin(stats, 0, "0", FALSE);
 }
 
 void validate_coin_three(int stats[3]) {
-    meta_validate_coin(stats, 3, "three", FALSE);
+    meta_validate_coin(stats, 3, "3", FALSE);
 }
 
 void validate_coin_two_fifty(int stats[3]) {
-    meta_validate_coin(stats, 250, "two hundred and fifty", FALSE);
+    meta_validate_coin(stats, 250, "250", FALSE);
 }
 
 void validate_coin_five_thousand(int stats[3]) {
-    meta_validate_coin(stats, 5000, "five thousand", FALSE);
+    meta_validate_coin(stats, 5000, "5000", FALSE);
 }
 
 void validate_coin_five(int stats[3]) {
-    meta_validate_coin(stats, 5, "five", TRUE);
+    meta_validate_coin(stats, 5, "5", TRUE);
 }
 
 void validate_coin_ten(int stats[3]) {
-    meta_validate_coin(stats, 10, "ten", TRUE);
+    meta_validate_coin(stats, 10, "10", TRUE);
 }
 
 void validate_coin_twenty(int stats[3]) {
-    meta_validate_coin(stats, 20, "twenty", TRUE);
+    meta_validate_coin(stats, 20, "20", TRUE);
 }
 
 void validate_coin_one_hundred(int stats[3]) {
-    meta_validate_coin(stats, 100, "one hundred", TRUE);
+    meta_validate_coin(stats, 100, "100", TRUE);
 }
 
 void validate_coin_two_hundred(int stats[3]) {
-    meta_validate_coin(stats, 200, "two hundred", TRUE);
+    meta_validate_coin(stats, 200, "200", TRUE);
 }
 
 void validate_coin_five_hundred(int stats[3]) {
-    meta_validate_coin(stats, 500, "five hundred", TRUE);
+    meta_validate_coin(stats, 500, "500", TRUE);
 }
 
 void validate_coin_one_thousand(int stats[3]) {
-    meta_validate_coin(stats, 1000, "one thousand", TRUE);
+    meta_validate_coin(stats, 1000, "1000", TRUE);
 }
-/**/
+/* end coin validation tests */
+
+/* Take coin tests */
 
 void take_coin_10_returns_10(int stats[3]) {
     int* coin_buffer;
@@ -98,7 +106,7 @@ void take_coin_10_returns_10(int stats[3]) {
     char* message;
     coin_buffer = safe_malloc(sizeof(*coin_buffer) * NUMDENOMS);
 
-    message = "Testing taking a ten cent coin...";
+    message = "  -Ten cent coin...";
     stats[0]++;
     coinval = take_coin(coin_buffer, "10");
     free(coin_buffer);
@@ -114,7 +122,7 @@ void take_coin_15_returns_0(int stats[3]) {
     char* message;
     coin_buffer = safe_malloc(sizeof(*coin_buffer) * NUMDENOMS);
 
-    message = "Testing taking a fifteen cent coin...";
+    message = "  -Fifteen cent coin...";
     stats[0]++;
     coinval = take_coin(coin_buffer, "15");
     free(coin_buffer);
@@ -130,7 +138,7 @@ void take_coin_empty_returns_neg1(int stats[3]) {
     char* message;
     coin_buffer = safe_malloc(sizeof(*coin_buffer) * NUMDENOMS);
 
-    message = "Testing taking an empty string coin(abort signal)...";
+    message = "  -Empty string (abort signal)...";
     stats[0]++;
     coinval = take_coin(coin_buffer, "");
     free(coin_buffer);
@@ -140,16 +148,20 @@ void take_coin_empty_returns_neg1(int stats[3]) {
     }
 }
 
+/* end take coin tests */
+
+/* accept payment tests ( requires user input ) */
+
 void meta_accept_payment(int stats[3], int* cb, int expected, const char* message) {
 
     stats[0]++;
     printf("%s\n", message);
     if(accept_payment(cb, 5) == expected) {
         stats[1]++;
-        printf("%78s", TEST_PASS);
+        printf("%53s", TEST_PASS);
     } else {
         stats[2]++;
-        printf("%78s", TEST_FAIL);
+        printf("%53s", TEST_FAIL);
     }
 }
 
@@ -158,7 +170,7 @@ void accept_payment_exact_change_returns_0(int stats[3]) {
     cb = safe_malloc(sizeof(*cb) * NUMDENOMS);
 
     meta_accept_payment(stats, cb, 0,
-                        "Testing accept payment on exact change\n (please enter 5 at the prompt)...");
+                        "  -Exact change (enter 5 at the prompt)...");
 
     free(cb);    
 }
@@ -167,7 +179,7 @@ void accept_payment_too_much_returns_5(int stats[3]) {
     int* cb;
     cb = safe_malloc(sizeof(*cb) * NUMDENOMS);
 
-    meta_accept_payment(stats, cb, 5, "Testing accept payment on overpay\n (please enter 10 at the prompt)...");
+    meta_accept_payment(stats, cb, 5, "  -Overpay (enter 10 at the prompt)...");
 
     free(cb);
 }
@@ -176,21 +188,22 @@ void accept_payment_abort_returns_neg1(int stats[3]){
     int* cb;
     cb = safe_malloc(sizeof(*cb) * NUMDENOMS);
     
-    meta_accept_payment(stats, cb, -1, "Testing accept payment abort\n (please press enter or ctrl-d at the prompt)...");
+    meta_accept_payment(stats, cb, -1, "  -Abort (press enter or ctrl-d at the prompt)...");
 
     free(cb);
 }
+/* end accept payment tests */
 
-
-
-void run_tests(struct vm* vm) {
-    int stats[3] = {0, 0, 0};
-    
-    printf("\n\nRunning test suite.\n\n");
-
+/* Test suites */
+void item_retrieval_tests(int stats[3], struct vm* vm) {
+    printf("Testing item retrieval :\n");
     get_missing_item(stats, vm);
     get_present_item(stats, vm);
     printf("\n");
+}
+
+void validate_coin_tests(int stats[3]) {
+    printf("Testing validate coin on:\n");
     validate_coin_zero(stats);
     validate_coin_three(stats);
     validate_coin_two_fifty(stats);
@@ -203,14 +216,52 @@ void run_tests(struct vm* vm) {
     validate_coin_five_hundred(stats);
     validate_coin_one_thousand(stats);
     printf("\n");
+}
+
+void take_coin_tests(int stats[3]) {
+    printf("Testing taking coins:\n");
     take_coin_10_returns_10(stats);
     take_coin_15_returns_0(stats);
     take_coin_empty_returns_neg1(stats);
     printf("\n");
+}
+
+void accept_payment_tests(int stats[3]) {
+    printf("Testing accept payment:\n");
     accept_payment_exact_change_returns_0(stats);
     accept_payment_too_much_returns_5(stats);
     accept_payment_abort_returns_neg1(stats);
     printf("\n");
+}
+
+void calculate_change_tests(int stats[3], struct vm* vm) {
+/* TODO: */
+    UNUSED(stats);
+    UNUSED(vm);
+    printf("Testing calculate change:\n");
+
+    printf("\n");
+
+}
+
+
+/* Main test function (this is where the party starts... ) */
+void run_tests(struct vm* vm) {
+    int stats[3] = {0, 0, 0};
+    
+    printf("\n\nRunning test suite.\n\n");
+
+    item_retrieval_tests(stats, vm);
+
+    validate_coin_tests(stats);
+
+    take_coin_tests(stats);
+/*  
+ *  These tests require user input, it's annoying so they're left out for now
+ *  accept_payment_tests(stats);
+ */
+
+    calculate_change_tests(stats, vm);
     
     printf("\n\n%d tests run, %d passed, %d failed\n", stats[0], stats[1], stats[2]);
 }
