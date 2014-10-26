@@ -6,6 +6,8 @@ Vending machine with CLI
 
 Latest Changes
 ----------
+- dispense change done, just need to tie all the purchase functions together
+    
 - accept payment function
 - tidied up test suite  
   

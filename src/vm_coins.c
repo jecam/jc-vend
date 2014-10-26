@@ -118,6 +118,30 @@ char * denom_to_str(enum denomination denom) {
     }
 }
 
+int denom_to_int(enum denomination denom) {
+    
+    switch(denom) {
+    case TEN_DOLLARS:
+        return 1000;
+    case FIVE_DOLLARS:
+        return 500;
+    case TWO_DOLLARS:
+        return 200;
+    case ONE_DOLLAR:
+        return 100;
+    case FIFTY_CENTS:
+        return 50;
+    case TWENTY_CENTS:
+        return 20;
+    case TEN_CENTS:
+        return 10;
+    case FIVE_CENTS:
+        return 5;
+    default:
+        return 0;
+    }
+}
+
 
 char* take_coin_input(char * input) {    
     printf("Insert coin: ");
@@ -173,3 +197,18 @@ int accept_payment(int coin_buffer[NUMDENOMS], int required){
     return payment - required;
 }
 
+void dispense_change(struct coin* coins, int change_required) {
+
+    while(change_required > 0) {
+        int i;
+        for (i = NUMDENOMS - 1; i >= 0; i--) {
+            if(coins[i].count > 0 && change_required >= denom_to_int(coins[i].denom)) {
+                
+                change_required -= denom_to_int(coins[i].denom);
+                coins[i].count--;
+                break; /* out of for loop */
+            }
+        }
+    }
+
+}

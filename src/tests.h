@@ -194,6 +194,60 @@ void accept_payment_abort_returns_neg1(int stats[3]){
 }
 /* end accept payment tests */
 
+/* Change calculator tests */
+/* Note that the test metric used here may be inaccurate, 
+   you can uncomment display_coins() lines to see contents of coins array before and after */
+void meta_dispense_change(int stats[3], struct coin coins[NUMDENOMS],
+                           int cents_required, int expected_diff, char* message) {
+    unsigned initial_coins[NUMDENOMS], i, diff = 0;
+    stats[0]++;
+
+    for (i = 0; i < NUMDENOMS; i++) {
+        initial_coins[i] = coins[i].count;
+    }    
+    
+    dispense_change(coins, cents_required);
+
+    for (i = 0; i < NUMDENOMS; i++) {
+        diff += initial_coins[i] - coins[i].count;
+    }
+
+    if (diff == expected_diff) {
+        PASS_FAIL(message);
+    }   
+}
+
+void dispense_no_change(int stats[3], struct vm * vm) {
+    char* message = "  -No change required...";
+    /* display_coins(vm); */
+    meta_dispense_change(stats, vm->coins, 0, 0, message);
+    /* display_coins(vm); */
+}
+
+void dispense_one_dollar_change(int stats[3], struct vm * vm) {
+    char* message = "  -$1 change required...";
+    /* display_coins(vm); */
+    meta_dispense_change(stats, vm->coins, 100, 1, message);
+    /* display_coins(vm); */
+}
+
+void dispense_one_dollar_change_cascade(int stats[3], struct vm * vm) {
+    char* message = "  -2 * 50c change (no $1)...";
+    vm->coins[4].count = 0;
+    /* display_coins(vm); */
+    meta_dispense_change(stats, vm->coins, 100, 2, message);
+    /* display_coins(vm); */
+    vm->coins[4].count = 20;
+}
+
+void dispense_eighteen_dollars_eighty_five_cents(int stats[3], struct vm * vm) {
+    char* message = "  -$18.85 (one of each coin)...";
+    /* display_coins(vm); */
+    meta_dispense_change(stats, vm->coins, 1885, NUMDENOMS, message);
+    /* display_coins(vm); */
+}
+/* end change dispenser tests */
+
 /* Test suites */
 void item_retrieval_tests(int stats[3], struct vm* vm) {
     printf("Testing item retrieval :\n");
@@ -234,12 +288,13 @@ void accept_payment_tests(int stats[3]) {
     printf("\n");
 }
 
-void calculate_change_tests(int stats[3], struct vm* vm) {
+void dispense_change_tests(int stats[3], struct vm* vm) {
 /* TODO: */
-    UNUSED(stats);
-    UNUSED(vm);
-    printf("Testing calculate change:\n");
-
+    printf("Testing dispense change:\n");
+    dispense_no_change(stats, vm);
+    dispense_one_dollar_change(stats, vm);
+    dispense_one_dollar_change_cascade(stats, vm);
+    dispense_eighteen_dollars_eighty_five_cents(stats, vm);
     printf("\n");
 
 }
@@ -261,7 +316,7 @@ void run_tests(struct vm* vm) {
  *  accept_payment_tests(stats);
  */
 
-    calculate_change_tests(stats, vm);
+    dispense_change_tests(stats, vm);
     
     printf("\n\n%d tests run, %d passed, %d failed\n", stats[0], stats[1], stats[2]);
 }
