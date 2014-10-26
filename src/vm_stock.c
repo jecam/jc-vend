@@ -1,7 +1,7 @@
 #include "vm_stock.h"
 
 /* Loads items from a file */
-BOOLEAN load_items(struct vm * vm, const char * items_fname) {
+BOOLEAN load_items(struct vm_list * item_list, const char * items_fname) {
     FILE * fh;
     char line[LINELEN];
     
@@ -38,7 +38,7 @@ BOOLEAN load_items(struct vm * vm, const char * items_fname) {
         cents = strtol(tok, NULL, 10);
 
         item = new_stock_item(id, name, description, dollars, cents, on_hand);
-        stock_insert(vm, item);        
+        stock_insert(item_list, item);        
     }
 
     fclose(fh);
@@ -75,17 +75,17 @@ struct stock_item* new_stock_item(char* id, char* name, char* description,
 
 
 /* Adds a node in alphabetical order by name */
-BOOLEAN stock_insert(struct vm * vm, struct stock_item * item) {
+BOOLEAN stock_insert(struct vm_list * item_list, struct stock_item * item) {
     struct vm_node * node = new_vm_node(item);
     struct vm_node * current, *previous;
     
-    if(vm->item_list->head == NULL) {
-        vm->item_list->head = node;
-        vm->item_list->length++;
+    if(item_list->head == NULL) {
+        item_list->head = node;
+        item_list->length++;
         return TRUE;
     }
     previous = NULL;
-    current = vm->item_list->head;
+    current = item_list->head;
 
     while (current && strcmp(node->data->name, current->data->name) > 0 ) {
         previous = current;
@@ -95,11 +95,11 @@ BOOLEAN stock_insert(struct vm * vm, struct stock_item * item) {
     
     node->next = current;
     if(!previous) {
-        vm->item_list->head = node;
+        item_list->head = node;
     } else {
         previous->next = node;
     }
-    vm->item_list->length++;
+    item_list->length++;
     return TRUE;
 }
 

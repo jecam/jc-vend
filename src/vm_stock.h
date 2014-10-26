@@ -48,11 +48,11 @@ struct vm_list
 };
 
 
-BOOLEAN load_items(struct vm * vm, const char * items_fname);
+BOOLEAN load_items(struct vm_list * item_list, const char * items_fname);
 struct vm_node* new_vm_node(struct stock_item* item);
 struct stock_item* new_stock_item(char* id, char* name, char* description,
                                unsigned dollars, unsigned cents, unsigned on_hand);
-BOOLEAN stock_insert(struct vm * vm, struct stock_item * item);
+BOOLEAN stock_insert(struct vm_list * item_list, struct stock_item * item);
 struct stock_item* retrieve_item(struct vm_list* list, char* id);
 void r_free_item_list(struct vm_node * node);
 

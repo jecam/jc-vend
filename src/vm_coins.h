@@ -9,7 +9,7 @@
 #define LINELEN 300
 
 
-BOOLEAN load_coins(struct vm * vm, const char * coins_fname);
+BOOLEAN load_coins(struct coin* coins, const char * coins_fname);
 BOOLEAN validate_coin(int coin);
 BOOLEAN str_to_denom(char * str, enum denomination * denom);
 BOOLEAN int_to_denom(int value, enum denomination* denom);

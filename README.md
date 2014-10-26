@@ -6,6 +6,7 @@ Vending machine with CLI
 
 Latest Changes
 ----------
+- minor refactoring of old code to decouple functions from vm struct when they don't need the whole thing
 - dispense change done, just need to tie all the purchase functions together
     
 - accept payment function

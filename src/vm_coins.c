@@ -3,7 +3,7 @@
 #include "vm_utility.h"
 
 /* Loads coins from a file */
-BOOLEAN load_coins(struct vm * vm, const char * coins_fname) {
+BOOLEAN load_coins(struct coin * coins, const char * coins_fname) {
     FILE* fh;
     char line[LINELEN];
     char * tok;
@@ -25,8 +25,8 @@ BOOLEAN load_coins(struct vm * vm, const char * coins_fname) {
         tok = strtok(NULL, "\n");
         count = strtol(tok, NULL, 10);
         
-        vm->coins[denom].denom = denom;
-        vm->coins[denom].count = count;
+        coins[denom].denom = denom;
+        coins[denom].count = count;
     }
 
     fclose(fh);
